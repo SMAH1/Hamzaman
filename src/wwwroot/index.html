@@ -1,0 +1,137 @@
+﻿
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sync Sider</title>
+    <script src="signalr.min.js"></script>
+    <script src="hubs.js"></script>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
+        }
+        .btnContainer {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
+            width: 400px;
+            justify-content: space-between;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 14px;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #357ab8;
+        }
+        svg {
+            margin-top: 20px;
+            width: 400px;
+            height: 400px;
+        }
+    </style>
+</head>
+<body>
+    <div class="btnContainer">
+        <button id="newShapeButton">New Shape</button>
+        <button id="newColorButton">New Color</button>
+    </div>
+    <svg id="svgCanvas" width="400" height="400" style="border: 1px solid #ccc;"></svg>
+
+    <script>
+        let lastColor = 'green';
+
+        function append(shape) {
+            const svgCanvas = document.getElementById('svgCanvas');
+
+            svgCanvas.innerHTML = '';
+            shape.setAttribute("fill", lastColor);
+            svgCanvas.appendChild(shape);
+        }
+
+        function applyColor() {
+            const svgCanvas = document.getElementById('svgCanvas');
+            if(svgCanvas.children.length > 0)
+                svgCanvas.children[0].setAttribute("fill", lastColor);
+        }
+
+        function addCircle(obj) {
+            let shape;
+            shape = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            shape.setAttribute("cx", obj.cx);
+            shape.setAttribute("cy", obj.cy);
+            shape.setAttribute("r", obj.r);
+            append(shape);
+        }
+
+        function addRect(obj) {
+            let shape;
+            shape = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+            shape.setAttribute("x", obj.x);
+            shape.setAttribute("y", obj.y);
+            shape.setAttribute("width", obj.w);
+            shape.setAttribute("height", obj.h);
+            append(shape);
+        }
+
+        //------------------------------------------------- HUB
+        function updateMessage(func, argument) {
+            switch(func) {
+                case 'circle': addCircle(JSON.parse(argument)); break;
+                case 'rect': addRect(JSON.parse(argument)); break;
+                case 'color': lastColor = argument; applyColor(); break;
+            }
+        }
+
+        var hub = new MessageHub("", updateMessage);
+        //-------------------------------------------------
+
+        document.getElementById('newShapeButton').addEventListener('click', async function() {
+            const shapeType = (Math.random() * 2) > 1 ? 'circle' : 'rect';
+
+            if (shapeType === 'circle') {
+                let obj = {
+                    cx: Math.random() * (400 - 20 * 2) + 20,
+                    cy: Math.random() * (400 - 20 * 2) + 20,
+                    r: 20
+                }
+                addCircle(obj);
+                await hub.send('circle', JSON.stringify(obj));
+            } else {
+                let obj = {
+                    x: Math.random() * (400 - 20 * 2),
+                    y: Math.random() * (400 - 20 * 2),
+                    w: 40,
+                    h: 40
+                }
+                addRect(obj);
+                await hub.send('rect', JSON.stringify(obj));
+            }
+        });
+        
+        document.getElementById('newColorButton').addEventListener('click', async function() {
+            const letters = '0123456789ABCDEF';
+            lastColor = '#';
+            for (let i = 0; i < 6; i++) {
+                lastColor += letters[Math.floor(Math.random() * 16)];
+            }
+            
+            applyColor();
+            await hub.send('color', lastColor);
+        });
+    </script>
+</body>
+</html>

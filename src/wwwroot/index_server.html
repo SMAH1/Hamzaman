@@ -1,0 +1,91 @@
+﻿
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sync Sider</title>
+    <script src="signalr.min.js"></script>
+    <script src="hubs.js"></script>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
+        }
+        button {
+            padding: 10px 20px;
+            margin-top: 5px;
+            font-size: 14px;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #357ab8;
+        }
+        svg {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <button id="sendPass">Send Passsword</button>
+    <button id="sendWrongPass">Send Wrong Passsword</button>
+    <dev id="msg"></dev>
+
+    <script>
+        let msg = document.getElementById('msg');
+
+        let listConnected = [];
+        let listDisconnected = [];
+
+        //------------------------------------------------- HUB
+        function updateMessage(connectionId, func, argument) {
+            msg.innerHTML = "FUNCTION: " + func + "<br />" + "ARGUMENT: " + argument;
+            if (argument == "SERVER" || argument == "EXIT")
+            showList();
+        }
+        function connectionState(connectionId, state) {
+            if(state){
+                listDisconnected = listDisconnected.filter(cid => cid !== connectionId);
+                listConnected.push(connectionId);
+            } else {
+                listConnected = listConnected.filter(cid => cid !== connectionId);
+                listDisconnected.push(connectionId);
+            }
+            showList(100);
+        }
+
+        var hub = new ServerHub("", updateMessage, connectionState);
+        //-------------------------------------------------
+
+        function showList(timeout = 2000) {
+            setTimeout(() => {
+                let str = '------ Connected: -----<br />'
+                listConnected.forEach(function (cid) { str += cid; str += '<br />'; });
+                str += '<br />';
+                str += '---- Disconnected: ----<br />'
+                listDisconnected.forEach(function (cid) { str += cid; str += '<br />'; });
+                msg.innerHTML = str;
+            }, timeout);
+        }
+
+        document.getElementById('sendPass').addEventListener('click', async function () {
+            msg.innerHTML = "";
+            await hub.sendToClient('', 'ItsMe', "PASSWORD");
+            showList();
+        });
+        
+        document.getElementById('sendWrongPass').addEventListener('click', async function () {
+            msg.innerHTML = "";
+            await hub.sendToClient('', 'ItsME', "PASSWORD");
+            showList();
+        });
+    </script>
+</body>
+</html>
