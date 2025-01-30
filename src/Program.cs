@@ -1,6 +1,6 @@
+using Hamzaman;
 using Microsoft.AspNetCore.SignalR;
 using System.Text.Json.Serialization;
-using Hamzaman;
 
 var builder = WebApplication.CreateSlimBuilder(args);
 
@@ -24,6 +24,9 @@ var configuration = builder.Configuration.GetSection("AppSettings");
 builder.Services.Configure<AppSettings>(configuration);
 configuration.Bind(appSettings);
 
+// Embedded Files  --------------------------------------------------
+var embeddedFiles = new EmbeddedFiles();
+
 // CORS  ------------------------------------------------------------
 builder.Services.AddCors(options =>
 {
@@ -46,6 +49,7 @@ builder.Services.AddCors(options =>
 
 // Singaleton -------------------------------------------------------
 builder.Services.AddSingleton(appSettings);
+builder.Services.AddSingleton(embeddedFiles);
 
 // APP  -------------------------------------------------------------
 var app = builder.Build();
@@ -73,7 +77,7 @@ else
     Console.WriteLine("Server Hub disabled!");
 
 app.MapGet("/", () => TypedResults.Redirect("/index.html"));
-app.StaticFilesApi(appSettings);
+app.StaticFilesApi(appSettings, embeddedFiles);
 
 app.Run();
 

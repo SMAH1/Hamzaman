@@ -57,7 +57,7 @@ public class ServerHub : Hub
 
     public async Task SendMessageToClient(string connectionId, string func, string argument)
     {
-        if(string.IsNullOrEmpty(connectionId))
+        if (string.IsNullOrEmpty(connectionId))
         {
             if (string.Compare(func, _appSettings.Server.CredentialCommand) == 0)
             {

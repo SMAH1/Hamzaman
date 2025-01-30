@@ -6,6 +6,7 @@ namespace Hamzaman;
 public static class InternalStaticFiles
 {
     private static AppSettings _settings = null!;
+    private static EmbeddedFiles _embeddedFiles = null!;
 
     private static byte[]? ReadFileContent(string filename, out bool error)
     {
@@ -13,12 +14,16 @@ public static class InternalStaticFiles
         var root = _settings.Root;
         var fullPathName = Path.Combine(root, filename);
 
+        filename = filename.ToLower();
+
         if (string.Compare(filename, "appsettings.json", true) != 0)
         {
             try
             {
                 if (File.Exists(fullPathName))
                     return File.ReadAllBytes(fullPathName);
+                else if (_embeddedFiles.Exists(filename))
+                    return _embeddedFiles.ReadAllBytes(filename);
             }
             catch { error = true; }
         }
@@ -43,9 +48,10 @@ public static class InternalStaticFiles
         return contentType!;
     }
 
-    public static void StaticFilesApi(this IEndpointRouteBuilder app, AppSettings settings)
+    public static void StaticFilesApi(this IEndpointRouteBuilder app, AppSettings settings, EmbeddedFiles embeddedFiles)
     {
         _settings = settings;
+        _embeddedFiles = embeddedFiles;
         app.MapGet("/{*filename}",
             (
                 [FromRoute] string filename

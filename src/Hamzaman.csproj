@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -8,5 +8,10 @@
     <PublishAot>true</PublishAot>
 	<Version>0.1.0</Version>
   </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Embedded\hubs.js" />
+    <EmbeddedResource Include="Embedded\signalr.min.js" />
+  </ItemGroup>
 
 </Project>
