@@ -12,6 +12,6 @@ public class MessageHub : Hub
 {
     public async Task SendMessage(string func, string argument)
     {
-        await Clients.All.SendAsync("ReceiveMessage", func, argument);
+        await Clients.AllExcept([Context.ConnectionId]).SendAsync("ReceiveMessage", func, argument);
     }
 }
