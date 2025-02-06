@@ -1,9 +1,9 @@
 
-Real-time collaborative applications similar [Fluid Framework](https://github.com/microsoft/FluidFramework).
+Real-time collaborative applications.
 
-Use dotnet core AOT and SignalR.
+Use __.NET 9 AOT__ and __SignalR__. The final file is an executable file that runs directly on your operating system and does not require .NET to be installed.
 
-Single excute file and run anywhre!!!
+Single excute file and run everywhere!!!
 
 ## How use
 
@@ -14,15 +14,16 @@ dotnet publish -r win-x64 -c Release
 ```
 or linux:
 ``` sh
-dotnet publish -r linux-arm64 -c Release
+dotnet publish -r linux-x64 -c Release
 ```
+For other environments see [.NET 9 Supported Versions](https://learn.microsoft.com/en-us/dotnet/core/install/windows#supported-versions) and [.NET 9 Known RIDs](https://learn.microsoft.com/en-us/dotnet/core/rid-catalog#known-rids).
 
 #### Run 
-1. Copy excute file
+1. Copy `Hamzaman` excute file (see [Releases](https://github.com/SMAH1/Hamzaman/releases))
 2. Build and config `appsettings.json`
 3. Creating `wwwroot` or other web roots defined in `appsettings.json`
-4. Copy your file (example folder) into previous folder
-5. Run the file
+4. Copy your web files into previous folder
+5. Run the `Hamzaman`
 
 Now, open internet browser and see result.
 
@@ -41,4 +42,4 @@ Establishes communication between the server and the connected clients.
 ![Mode Message](./doc/Hamzaman-Server.gif)
 
 ## Next
-Build website, application, or other language that supports _SignalR_ web sockets and use this project to communicate between them.
+Build webpage or application in any language that supports __SignalR__ web sockets and use this project to communicate between them.
