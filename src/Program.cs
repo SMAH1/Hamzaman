@@ -12,6 +12,7 @@ static class Program
         ErrorConfigFileNotExists = 1,
         ErrorJsonFormatOfConfigFile = 2,
         ErrorReadConfigFile = 3,
+        ErrorConfigInvalidate = 4,
     }
 
     [STAThread]
@@ -68,7 +69,7 @@ static class Program
         return ErrorMainReturn.OK;
     }
 
-    static void Initialize(string? appSettingFile)
+    static ErrorMainReturn Initialize(string? appSettingFile)
     {
         var builder = WebApplication.CreateSlimBuilder();
 
@@ -93,6 +94,12 @@ static class Program
         var configuration = builder.Configuration.GetSection("AppSettings");
         builder.Services.Configure<AppSettings>(configuration);
         configuration.Bind(appSettings);
+
+        if (appSettings.HttpPort == 0 && appSettings.HttpsPort == 0)
+        {
+            Console.Error.WriteLine($"HTTP and HTTPS are disabled!");
+            return ErrorMainReturn.ErrorConfigInvalidate;
+        }
 
         // Embedded Files  --------------------------------------------------
         var embeddedFiles = new EmbeddedFiles();
@@ -124,7 +131,10 @@ static class Program
         // APP  -------------------------------------------------------------
         var app = builder.Build();
 
-        app.Urls.Add($"http://{appSettings.Host}:{appSettings.HttpPort}");
+        if (appSettings.HttpPort > 0)
+            app.Urls.Add($"http://{appSettings.Host}:{appSettings.HttpPort}");
+        else
+            Console.WriteLine("HTTP disabled!");
         if (appSettings.HttpsPort > 0 && appSettings.HttpsPort != appSettings.HttpPort)
             app.Urls.Add($"https://{appSettings.Host}:{appSettings.HttpsPort}");
         else
@@ -150,6 +160,8 @@ static class Program
         app.StaticFilesApi(appSettings, embeddedFiles);
 
         app.Run();
+
+        return ErrorMainReturn.OK;
     }
 }
 
