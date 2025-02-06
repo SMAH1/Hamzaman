@@ -21,6 +21,9 @@ static class Program
         ErrorMainReturn ret = ErrorMainReturn.OK;
         string? appSettingFile = null;
 
+        if (NeedShowHelp(args))
+            return 0;
+
         (ret, appSettingFile) = GetSettingFile(args);
         if (ret != ErrorMainReturn.OK) return (int)ret;
 
@@ -33,6 +36,29 @@ static class Program
         Initialize(appSettingFile);
 
         return 0;
+    }
+
+    private static bool NeedShowHelp(string[] args)
+    {
+        if (args.Length > 0)
+        {
+            foreach(var str in args)
+            {
+                if(string.Compare(str, "--help", true) == 0 || string.Compare(str, "-h", true) == 0)
+                {
+                    Console.WriteLine("");
+                    Console.WriteLine("Hamzaman is an app for creating real-time collaborative apps.");
+                    Console.WriteLine("");
+                    Console.WriteLine("Help:");
+                    Console.WriteLine("  --help, -h : Show this help");
+                    Console.WriteLine("  --connfig  : Change configuration file (default is 'appsettings.json')");
+                    Console.WriteLine("");
+                    Console.WriteLine("See more information: https://github.com/SMAH1/Hamzaman");
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     static (ErrorMainReturn, string?) GetSettingFile(string[] args)
