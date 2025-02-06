@@ -101,6 +101,15 @@ static class Program
             return ErrorMainReturn.ErrorConfigInvalidate;
         }
 
+        if (
+            !(appSettings.Message.Enable && !string.IsNullOrEmpty(appSettings.Message.Hub)) && 
+            !(appSettings.Server.Enable && !string.IsNullOrEmpty(appSettings.Server.Hub))
+            )
+        {
+            Console.Error.WriteLine($"Message hub and Server hub are disabled!");
+            return ErrorMainReturn.ErrorConfigInvalidate;
+        }
+
         // Embedded Files  --------------------------------------------------
         var embeddedFiles = new EmbeddedFiles();
 
