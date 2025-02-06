@@ -49,6 +49,9 @@ public class ServerHub : Hub
 
     public async Task SendMessage(string func, string argument)
     {
+        if (string.IsNullOrEmpty(func))
+            return;
+
         if (HasServer)
         {
             await Clients.Client(ServerConnectionId).CallReceiveMessageAsync(Context.ConnectionId, func, argument);
@@ -57,6 +60,9 @@ public class ServerHub : Hub
 
     public async Task SendMessageToClient(string connectionId, string func, string argument)
     {
+        if (string.IsNullOrEmpty(func))
+            return;
+
         if (string.IsNullOrEmpty(connectionId))
         {
             if (string.Compare(func, _appSettings.Server.CredentialCommand) == 0)

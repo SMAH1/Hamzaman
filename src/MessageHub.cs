@@ -12,6 +12,9 @@ public class MessageHub : Hub
 {
     public async Task SendMessage(string func, string argument)
     {
+        if (string.IsNullOrEmpty(func))
+            return;
+
         await Clients.AllExcept([Context.ConnectionId]).SendAsync("ReceiveMessage", func, argument);
     }
 }
