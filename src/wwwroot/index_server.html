@@ -15,7 +15,7 @@
             background-color: #f5f5f5;
             font-family: Arial, sans-serif;
         }
-        button {
+        #sendPass {
             padding: 10px 20px;
             margin-top: 5px;
             font-size: 14px;
@@ -24,18 +24,31 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            width: 200px;
         }
-        button:hover {
+        #sendPass:hover {
             background-color: #357ab8;
         }
-        svg {
-            margin-top: 20px;
+        #txtPassword {
+            width: 150px;
+            padding: 10px;
+            margin: 10px auto;
+            display: block;
+            border: 2px solid #4CAF50;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        #txtPassword:focus {
+            border-color: #45a049;
+            outline: none;
         }
     </style>
 </head>
 <body>
+    <input type="text" id="txtPassword" placeholder="password">
     <button id="sendPass">Send Passsword</button>
-    <button id="sendWrongPass">Send Wrong Passsword</button>
     <dev id="msg"></dev>
 
     <script>
@@ -48,10 +61,10 @@
         function updateMessage(connectionId, func, argument) {
             msg.innerHTML = "FUNCTION: " + func + "<br />" + "ARGUMENT: " + argument;
             if (argument == "SERVER" || argument == "EXIT")
-            showList();
+                showList();
         }
         function connectionState(connectionId, state) {
-            if(state){
+            if (state) {
                 listDisconnected = listDisconnected.filter(cid => cid !== connectionId);
                 listConnected.push(connectionId);
             } else {
@@ -76,14 +89,9 @@
         }
 
         document.getElementById('sendPass').addEventListener('click', async function () {
+            var password = document.getElementById('txtPassword').value;
             msg.innerHTML = "";
-            await hub.sendToClient('', 'ItsMe', "PASSWORD");
-            showList();
-        });
-        
-        document.getElementById('sendWrongPass').addEventListener('click', async function () {
-            msg.innerHTML = "";
-            await hub.sendToClient('', 'ItsME', "PASSWORD");
+            await hub.sendToClient('', 'ItsMe', password);
             showList();
         });
     </script>

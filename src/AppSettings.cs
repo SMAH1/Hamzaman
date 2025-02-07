@@ -35,4 +35,13 @@ public class Server
     public string Hub { get; set; } = "serverHub";
     public string CredentialCommand { get; set; } = "";
     public string CredentialValue { get; set; } = "";
+    public ServerCredentialTotp CredentialTotp { get; set; } = new ServerCredentialTotp();
+}
+
+public class ServerCredentialTotp
+{
+    public bool Enable { get; set; } = false;
+    public string Key { get; set; } = string.Empty;
+    public int Length { get; set; } = 6;
+    public int Peroid { get; set; } = 60;
 }

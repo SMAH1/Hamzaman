@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using OtpNet;
 
 namespace Hamzaman;
 
@@ -23,10 +24,21 @@ public class ServerHub : Hub
     private static bool HasServer => !string.IsNullOrEmpty(ServerConnectionId);
 
     private readonly AppSettings _appSettings;
+    private readonly Totp? _totp = null;
 
     public ServerHub(AppSettings appSettings)
     {
         _appSettings = appSettings;
+
+        if (appSettings.Server.CredentialTotp.Enable && !string.IsNullOrEmpty(appSettings.Server.CredentialTotp.Key))
+        {
+            _totp = new Totp(
+                Base32Encoding.ToBytes(appSettings.Server.CredentialTotp.Key),
+                appSettings.Server.CredentialTotp.Peroid,
+                OtpHashMode.Sha512,
+                appSettings.Server.CredentialTotp.Length
+                );
+        }
     }
 
     public override async Task OnConnectedAsync()
@@ -67,7 +79,7 @@ public class ServerHub : Hub
         {
             if (string.Compare(func, _appSettings.Server.CredentialCommand) == 0)
             {
-                if (string.Compare(argument, _appSettings.Server.CredentialValue) == 0)
+                if (IsValidPassword(argument))
                 {
                     if (string.Compare(ServerConnectionId, Context.ConnectionId) != 0)
                     {
@@ -81,6 +93,10 @@ public class ServerHub : Hub
                         await Groups.AddToGroupAsync(ServerConnectionId, GROUP_NAME);
                         await Clients.Caller.CallReceiveMessageAsync("", func, "SERVER");
                     }
+                    else
+                    {
+                        await Clients.Caller.CallReceiveMessageAsync("", func, "SERVER_TOO");
+                    }
                 }
             }
         }
@@ -92,6 +108,14 @@ public class ServerHub : Hub
             }
             catch { }
         }
+    }
+
+    private bool IsValidPassword(string password)
+    {
+        if (_totp is not null)
+            return _totp.VerifyTotp(password, out _);
+
+        return (string.Compare(password, _appSettings.Server.CredentialValue) == 0);
     }
 }
 
