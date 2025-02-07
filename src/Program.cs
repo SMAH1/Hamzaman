@@ -1,5 +1,6 @@
 using Hamzaman;
 using Microsoft.AspNetCore.SignalR;
+using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -13,6 +14,9 @@ static class Program
         ErrorJsonFormatOfConfigFile = 2,
         ErrorReadConfigFile = 3,
         ErrorConfigInvalidate = 4,
+        ErrorHttpsCertificateInvalidate = 5,
+
+        ErrorUnknown = 100,
     }
 
     [STAThread]
@@ -42,9 +46,9 @@ static class Program
     {
         if (args.Length > 0)
         {
-            foreach(var str in args)
+            foreach (var str in args)
             {
-                if(string.Compare(str, "--help", true) == 0 || string.Compare(str, "-h", true) == 0)
+                if (string.Compare(str, "--help", true) == 0 || string.Compare(str, "-h", true) == 0)
                 {
                     Console.WriteLine("");
                     Console.WriteLine("Hamzaman is an app for creating real-time collaborative apps.");
@@ -105,14 +109,6 @@ static class Program
             o.PayloadSerializerOptions.TypeInfoResolverChain.Insert(0, AppJsonSerializerContext.Default);
         });
 
-        // HTTPS  -----------------------------------------------------------
-        builder.WebHost.UseKestrel(options =>
-        {
-            options.ConfigureHttpsDefaults(httpsOptions =>
-            {
-            });
-        });
-
         // Application Settings  --------------------------------------------
         AppSettings appSettings = new AppSettings();
         if (appSettingFile is not null)
@@ -128,13 +124,27 @@ static class Program
         }
 
         if (
-            !(appSettings.Message.Enable && !string.IsNullOrEmpty(appSettings.Message.Hub)) && 
+            !(appSettings.Message.Enable && !string.IsNullOrEmpty(appSettings.Message.Hub)) &&
             !(appSettings.Server.Enable && !string.IsNullOrEmpty(appSettings.Server.Hub))
             )
         {
             Console.Error.WriteLine($"Message hub and Server hub are disabled!");
             return ErrorMainReturn.ErrorConfigInvalidate;
         }
+
+        // HTTPS  -----------------------------------------------------------
+        builder.WebHost.UseKestrel(options =>
+        {
+            options.ConfigureHttpsDefaults(httpsOptions =>
+            {
+                if (appSettings.HttpsCertificate.Enable && !string.IsNullOrEmpty(appSettings.HttpsCertificate.PfxFile))
+                {
+                    httpsOptions.ServerCertificate = X509CertificateLoader.LoadPkcs12FromFile(
+                        appSettings.HttpsCertificate.PfxFile,
+                        appSettings.HttpsCertificate.Password);
+                }
+            });
+        });
 
         // Embedded Files  --------------------------------------------------
         var embeddedFiles = new EmbeddedFiles();
@@ -194,7 +204,20 @@ static class Program
         app.MapGet("/", () => TypedResults.Redirect("/index.html"));
         app.StaticFilesApi(appSettings, embeddedFiles);
 
-        app.Run();
+        try
+        {
+            app.Run();
+        }
+        catch (System.Security.Cryptography.CryptographicException)
+        {
+            Console.Error.WriteLine($"Error in load of certificate file '{appSettings.HttpsCertificate.PfxFile}' or password error.");
+            return ErrorMainReturn.ErrorHttpsCertificateInvalidate;
+        }
+        catch (Exception exp)
+        {
+            Console.Error.WriteLine(exp.Message);
+            return ErrorMainReturn.ErrorUnknown;
+        }
 
         return ErrorMainReturn.OK;
     }

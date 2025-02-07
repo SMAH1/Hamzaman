@@ -11,8 +11,16 @@ public class AppSettings
 
     public string[] CORS { get; set; } = [];
 
+    public HttpsCertificate HttpsCertificate { get; set; } = new HttpsCertificate();
     public Message Message { get; set; } = new Message();
     public Server Server { get; set; } = new Server();
+}
+
+public class HttpsCertificate
+{
+    public bool Enable { get; set; } = false;
+    public string PfxFile { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
 }
 
 public class Message
