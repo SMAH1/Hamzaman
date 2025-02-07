@@ -14,6 +14,10 @@ function MessageHub(address, receiverCallback) {
     });
 
     this.connection.start().catch(err => console.error(err));
+
+    this.connection.onreconnected((cid) => { this.receiver('', 'RECONNECTED'); });
+
+    this.connection.start().then(() => { this.receiver('', 'CONNECTED'); }).catch(err => console.error(err));
 }
 
 MessageHub.prototype.send = async function (func, message) {
@@ -44,6 +48,10 @@ function ServerHub(address, receiverCallback, connectionStateCallback) {
     });
 
     this.connection.start().catch(err => console.error(err));
+
+    this.connection.onreconnected((cid) => { this.receiver('', 'RECONNECTED'); });
+
+    this.connection.start().then(() => { this.receiver('', 'CONNECTED'); }).catch(err => console.error(err));
 }
 
 ServerHub.prototype.sendToClient = async function (connectionId, func, message) {
