@@ -30,7 +30,7 @@ public class ServerHub : Hub
     {
         _appSettings = appSettings;
 
-        if (appSettings.Server.CredentialTotp.Enable && !string.IsNullOrEmpty(appSettings.Server.CredentialTotp.Key))
+        if (appSettings.Server.CredentialTotp.IsEnableAndAvailable())
         {
             _totp = new Totp(
                 Base32Encoding.ToBytes(appSettings.Server.CredentialTotp.Key),

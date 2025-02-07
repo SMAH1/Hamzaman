@@ -117,15 +117,15 @@ static class Program
         builder.Services.Configure<AppSettings>(configuration);
         configuration.Bind(appSettings);
 
-        if (appSettings.HttpPort == 0 && appSettings.HttpsPort == 0)
+        if (appSettings.IsHttpEnable() && appSettings.IsHttpsEnable())
         {
             Console.Error.WriteLine($"HTTP and HTTPS are disabled!");
             return ErrorMainReturn.ErrorConfigInvalidate;
         }
 
         if (
-            !(appSettings.Message.Enable && !string.IsNullOrEmpty(appSettings.Message.Hub)) &&
-            !(appSettings.Server.Enable && !string.IsNullOrEmpty(appSettings.Server.Hub))
+            !appSettings.Message.IsEnableAndAvailable() &&
+            !appSettings.Server.IsEnableAndAvailable()
             )
         {
             Console.Error.WriteLine($"Message hub and Server hub are disabled!");
@@ -137,7 +137,7 @@ static class Program
         {
             options.ConfigureHttpsDefaults(httpsOptions =>
             {
-                if (appSettings.HttpsCertificate.Enable && !string.IsNullOrEmpty(appSettings.HttpsCertificate.PfxFile))
+                if (appSettings.HttpsCertificate.IsEnableAndAvailable())
                 {
                     httpsOptions.ServerCertificate = X509CertificateLoader.LoadPkcs12FromFile(
                         appSettings.HttpsCertificate.PfxFile,
@@ -155,9 +155,8 @@ static class Program
             options.AddDefaultPolicy(
                 policy =>
                 {
-                    policy.WithOrigins($"http://{appSettings.Host}:{appSettings.HttpPort}");
-                    if (appSettings.HttpsPort > 0 && appSettings.HttpsPort != appSettings.HttpPort)
-                        policy.WithOrigins($"https://{appSettings.Host}:{appSettings.HttpsPort}");
+                    if (appSettings.IsHttpEnable()) policy.WithOrigins($"http://{appSettings.Host}:{appSettings.HttpPort}");
+                    if (appSettings.IsHttpsEnable()) policy.WithOrigins($"https://{appSettings.Host}:{appSettings.HttpsPort}");
 
                     foreach (var cors in appSettings.CORS)
                         policy.WithOrigins(cors);
@@ -176,25 +175,26 @@ static class Program
         // APP  -------------------------------------------------------------
         var app = builder.Build();
 
-        if (appSettings.HttpPort > 0)
+        if (appSettings.IsHttpEnable())
             app.Urls.Add($"http://{appSettings.Host}:{appSettings.HttpPort}");
         else
             Console.WriteLine("HTTP disabled!");
-        if (appSettings.HttpsPort > 0 && appSettings.HttpsPort != appSettings.HttpPort)
+
+        if (appSettings.IsHttpsEnable())
             app.Urls.Add($"https://{appSettings.Host}:{appSettings.HttpsPort}");
         else
             Console.WriteLine("HTTPS disabled!");
 
         app.UseCors();
 
-        if (appSettings.Message.Enable && !string.IsNullOrEmpty(appSettings.Message.Hub))
+        if (appSettings.Message.IsEnableAndAvailable())
         {
             app.MapHub<MessageHub>("/" + appSettings.Message.Hub);
         }
         else
             Console.WriteLine("Message Hub disabled!");
 
-        if (appSettings.Server.Enable && !string.IsNullOrEmpty(appSettings.Server.Hub))
+        if (appSettings.Server.IsEnableAndAvailable())
         {
             app.MapHub<ServerHub>("/" + appSettings.Server.Hub);
         }

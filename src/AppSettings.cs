@@ -29,10 +29,14 @@ public class Message
     public string Hub { get; set; } = "messageHub";
 }
 
-public class Server
+public class Server : Message
 {
-    public bool Enable { get; set; } = false;
-    public string Hub { get; set; } = "serverHub";
+    public Server()
+    {
+        Enable = false;
+        Hub = "serverHub";
+    }
+
     public string CredentialCommand { get; set; } = "";
     public string CredentialValue { get; set; } = "";
     public ServerCredentialTotp CredentialTotp { get; set; } = new ServerCredentialTotp();
@@ -44,4 +48,40 @@ public class ServerCredentialTotp
     public string Key { get; set; } = string.Empty;
     public int Length { get; set; } = 6;
     public int Peroid { get; set; } = 60;
+}
+
+public static class AppSettingsExtensions
+{
+    public static bool IsEnableAndAvailable(this HttpsCertificate src)
+    {
+        if (!src.Enable) return false;
+        if (string.IsNullOrEmpty(src.PfxFile)) return false;
+        return true;
+    }
+
+    public static bool IsHttpEnable(this AppSettings src)
+    {
+        return src.HttpPort > 0;
+    }
+
+    public static bool IsHttpsEnable(this AppSettings src)
+    {
+        if (src.HttpsPort == 0) return false;
+        if (src.HttpsPort == src.HttpPort) return false;
+        return true;
+    }
+
+    public static bool IsEnableAndAvailable(this Message src)
+    {
+        if (!src.Enable) return false;
+        if (string.IsNullOrEmpty(src.Hub)) return false;
+        return true;
+    }
+
+    public static bool IsEnableAndAvailable(this ServerCredentialTotp src)
+    {
+        if (!src.Enable) return false;
+        if (string.IsNullOrEmpty(src.Key)) return false;
+        return true;
+    }
 }
