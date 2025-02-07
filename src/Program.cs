@@ -117,7 +117,7 @@ static class Program
         builder.Services.Configure<AppSettings>(configuration);
         configuration.Bind(appSettings);
 
-        if (appSettings.IsHttpEnable() && appSettings.IsHttpsEnable())
+        if (!appSettings.IsHttpEnable() && !appSettings.IsHttpsEnable())
         {
             Console.Error.WriteLine($"HTTP and HTTPS are disabled!");
             return ErrorMainReturn.ErrorConfigInvalidate;
