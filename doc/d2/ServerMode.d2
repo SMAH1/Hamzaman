@@ -1,0 +1,217 @@
+title1: {
+  label: Server Mode
+  near: top-center
+  shape: text
+  style: {
+    font-size: 50
+    bold: true
+  }
+}
+
+title2: {
+  label: |latex
+    \space
+  |
+  near: bottom-center
+  shape: text
+  style.font-size: 40
+}
+
+grid-rows: 3
+grid-columns: 3
+horizontal-gap: 200
+vertical-gap: 200
+
+# ## ------- Nodes --------------
+0,0.class: empty
+server: {
+  label: "Server"
+  class: [server]
+}
+0,3.class: empty
+client1: {
+  label: "Client 1"
+  class: [client]
+}
+hamzaman: {
+  label: Hamzaman
+  shape: circle
+  style: {
+    fill: lightblue
+    stroke: lightblue
+    font-color: green
+    font: mono
+    font-size: 20
+    bold: true
+  }
+}
+client3: {
+  label: "Client 3"
+  class: [client]
+}
+2,0.class: empty
+client2: {
+  label: "Client 2"
+  class: [client]
+}
+2,3.class: empty
+
+# ## ------- Classes --------------
+classes: {
+  empty: {
+    label: ""
+    style: {
+      fill: transparent
+      stroke: transparent
+    }
+  }
+  client: {
+    style: {
+      fill: lightgray
+      stroke: gray
+      font-color: black
+      font: mono
+      font-size: 20
+      bold: true
+    }
+  }
+  server: {
+    shape: cloud
+    style: {
+      fill: lightgray
+      stroke: gray
+      font-color: black
+      font: mono
+      font-size: 20
+      bold: true
+    }
+  }
+  connected: {
+    style: {
+      stroke: gray
+      stroke-width: 3
+      opacity: 0.2
+    }
+  }
+  sendmessage: {
+    target-arrowhead.shape: arrow
+    style: {
+      stroke: "#0000ee"
+      stroke-width: 5
+      animated: true
+    }
+  }
+  receivemessage: {
+    target-arrowhead.shape: arrow
+    style: {
+      stroke: "#00ee00"
+      stroke-width: 5
+      animated: true
+    }
+  }
+}
+
+# ## ------- Connections --------------
+hamzaman -- client1: {
+  class: connected
+}
+hamzaman -- client2: {
+  class: connected
+}
+hamzaman -- client3: {
+  class: connected
+}
+hamzaman -- server: {
+  class: connected
+}
+
+hamzaman <- client1: {
+  class: sendmessage
+}
+hamzaman <- client2: {
+  class: sendmessage
+}
+hamzaman <- client3: {
+  class: sendmessage
+}
+hamzaman <- server: {
+  class: sendmessage
+}
+
+hamzaman -> client1: {
+  class: receivemessage
+}
+hamzaman -> client2: {
+  class: receivemessage
+}
+hamzaman -> client3: {
+  class: receivemessage
+}
+hamzaman -> server: {
+  class: receivemessage
+}
+
+# ## ------- Hide --------------
+(hamzaman <- client1)[0].style.opacity: 0
+(hamzaman <- client2)[0].style.opacity: 0
+(hamzaman <- client3)[0].style.opacity: 0
+(hamzaman <- server)[0].style.opacity: 0
+(hamzaman -> client1)[0].style.opacity: 0
+(hamzaman -> client2)[0].style.opacity: 0
+(hamzaman -> client3)[0].style.opacity: 0
+(hamzaman -> server)[0].style.opacity:  0
+
+## ------- Animation --------------
+steps: {
+  1: { 
+(hamzaman <- client1)[0].style.opacity: 1
+(hamzaman -> server)[0].style.opacity:  1
+title2.label: |latex
+    \huge\color{black}Message \space from \space \color{blue}client \space 1  \space \color{black}to  \space \color{green}server
+    | 
+  }
+  2: {
+  }
+  3: {
+(hamzaman <- client1)[0].style.opacity: 0
+(hamzaman -> server)[0].style.opacity:  0
+(hamzaman <- client2)[0].style.opacity: 1
+(hamzaman -> server)[0].style.opacity:  1
+title2.label: |latex
+    \huge\color{black}Message \space from \space \color{blue}client \space 2  \space \color{black}to  \space \color{green}server
+    | 
+  }
+  4: {
+  }
+  5: {
+(hamzaman <- client2)[0].style.opacity: 0
+(hamzaman -> server)[0].style.opacity:  0
+(hamzaman <- server)[0].style.opacity: 1
+(hamzaman -> client3)[0].style.opacity: 1
+title2.label: |latex
+    \huge\color{black}Message \space from \space \color{blue}server  \space \color{black}to  \space \color{green}client \space 3
+    | 
+  }
+  6: {
+  }
+  7: {
+(hamzaman <- server)[0].style.opacity: 0
+(hamzaman -> client3)[0].style.opacity: 0
+(hamzaman <- server)[0].style.opacity: 1
+(hamzaman -> client2)[0].style.opacity: 1
+title2.label: |latex
+    \huge\color{black}Message \space from \space \color{blue}server  \space \color{black}to  \space \color{green}client \space 2
+    | 
+  }
+  8: {
+  }
+  9: {
+(hamzaman <- server)[0].style.opacity: 0
+(hamzaman -> client2)[0].style.opacity: 0
+title2.label: |latex
+    \space
+    | 
+  }
+  10: {
+  }
+}

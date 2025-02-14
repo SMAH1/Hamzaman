@@ -1,0 +1,119 @@
+title1: {
+  label: Message Mode Sequence Diagram
+  near: top-center
+  shape: text
+  style: {
+    font-size: 50
+    bold: true
+  }
+}
+
+# ## ------- Nodes --------------
+shape: sequence_diagram
+hamzaman: Hamazaman {
+  class: [hamzaman]
+}
+client1: {
+  label: "Client 1"
+  class: [client]
+}
+client2: {
+  label: "Client 2"
+  class: [client]
+}
+client3: {
+  label: "Client 3"
+  class: [client]
+}
+client4: {
+  label: "Client 4"
+  class: [client]
+}
+client5: {
+  label: "Client 5"
+  class: [client]
+}
+
+Broadcast from client 1 to other clients: {
+  class: [arraow]
+  client1 -> hamzaman: {
+    label: "    func 1, message 1    "
+    class: [arraow]
+  }
+  echo to other: {
+    class: [arraow]
+    client2 <- hamzaman: {
+      label: "    func 1, message 1    "
+      class: [arraow]
+    }
+    client3 <- hamzaman: {
+      label: "    func 1, message 1    "
+      class: [arraow]
+    }
+    client4 <- hamzaman: {
+      label: "    func 1, message 1    "
+      class: [arraow]
+    }
+    client5 <- hamzaman: {
+      label: "    func 1, message 1    "
+      class: [arraow]
+    }
+  }
+}
+
+Broadcast from client 5 to other clients: {
+  class: [arraow]
+  client5 -> hamzaman: {
+    label: "    func 2, message 2    "
+    class: [arraow]
+  }
+  echo to other: {
+    class: [arraow]
+    client1 <- hamzaman: {
+      label: "    func 2, message 2    "
+      class: [arraow]
+    }
+    client2 <- hamzaman: {
+      label: "    func 2, message 2    "
+      class: [arraow]
+    }
+    client3 <- hamzaman: {
+      label: "    func 2, message 2    "
+      class: [arraow]
+    }
+    client4 <- hamzaman: {
+      label: "    func 2, message 2    "
+      class: [arraow]
+    }
+  }
+}
+
+# ## ------- Classes --------------
+classes: {
+  client: {
+    style: {
+      fill: lightgray
+      stroke: gray
+      font-color: black
+      font: mono
+      font-size: 20
+      bold: true
+    }
+  }
+  hamzaman: {
+    shape: circle
+    style: {
+      fill: lightblue
+      stroke: lightblue
+      font-color: green
+      font: mono
+      font-size: 20
+      bold: true
+    }
+  }
+  arraow: {
+    style: {
+      font-size: 20
+    }
+  }
+}

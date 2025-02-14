@@ -33,13 +33,25 @@ Now, open internet browser and see result.
 
 Establishes communication between all connected clients.
 
-![Mode Message](./doc/Hamzaman-Message.gif)
+![Mode Message](./doc/images/Hamzaman-Message.gif)
+
+##### How to work
+
+![Mode Message Broadcast](./doc/d2/MessageMode.svg)
+
+![Mode Message Sequence Diagram](./doc/d2/MessageModeSequenceDiagram.svg)
 
 #### Server
 
 Establishes communication between the server and the connected clients.
 
-![Mode Message](./doc/Hamzaman-Server.gif)
+![Mode Message](./doc/images/Hamzaman-Server.gif)
+
+##### How to work
+
+![Mode Message Broadcast](./doc/d2/ServerMode.svg)
+
+![Mode Message Sequence Diagram](./doc/d2/ServerModeSequenceDiagram.svg)
 
 ## Next
 Build webpage or application in any language that supports __SignalR__ web sockets and use this project to communicate between them.
